@@ -1,0 +1,41 @@
+# ansible/inventory/inventory.proxmox.example.yml
+# -----------------------------------------------------------------------------
+# Proxmox Dynamic Inventory Configuration
+#
+# SECURITY NOTE: 
+# Do not put your actual Proxmox URL or API tokens in this file. 
+# Rename this file to `inventory.proxmox.yml` (which is gitignored) and 
+# export the following environment variables before running Ansible:
+#   export PROXMOX_URL="https://your-proxmox-ip:8006/"
+#   export PROXMOX_TOKEN_ID="your-user@pam!your-token-name"
+#   export PROXMOX_TOKEN_SECRET="your-secret-uuid"
+# -----------------------------------------------------------------------------
+
+plugin: community.proxmox.proxmox
+user: ansible@pve # Change to your Proxmox API user
+validate_certs: false
+want_facts: true
+want_proxmox_nodes_ansible_host: false
+
+compose:
+  # 1. Try LXC interfaces (proxmox_lxc_interfaces.eth0.inet)
+  # 2. If that doesn't exist (QEMU VM), fall back to qemu-guest-agent interfaces
+  #    (proxmox_agent_interfaces[eth0/ens18].ip-addresses[0])
+  # 3. Strip the /mask from whatever we got.
+  ansible_host: >
+    (
+      (proxmox_lxc_interfaces | default([]))
+      | selectattr('name', 'equalto', 'eth0')
+      | map(attribute='inet')
+      | first
+      | default(
+          (proxmox_agent_interfaces | default([]))
+          | selectattr('name', 'in', 'eth0,ens18')
+          | map(attribute='ip-addresses')
+          | flatten
+          | first
+        )
+    ) | regex_replace('/.*', '')
+  
+  # Default SSH user for the provisioned machines
+  ansible_user: "'anbar'"

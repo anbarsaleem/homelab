@@ -1,0 +1,5 @@
+**/.env
+ansible/.vault_password
+ansible/group_vars/all/vault.yml
+ansible/inventory/hosts
+ansible/inventory/inventory.proxmox.yml

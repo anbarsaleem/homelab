@@ -1,0 +1,169 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "content": "<div style=\"font-family: 'Courier New', monospace; color: #39FF14; text-align: center; background-color: #050505; padding: 10px; border: 1px solid #1E5631;\">\n  <h1 style=\"margin: 0; font-size: 28px; text-shadow: 0 0 5px #39FF14;\">SYSTEM MONITORING // MATRIX NODE</h1>\n  <p style=\"margin: 5px 0 0 0; font-size: 14px; letter-spacing: 2px;\">FOLLOW THE WHITE RABBIT</p>\n</div>",
+        "mode": "html"
+      },
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 9, "w": 14, "x": 0, "y": 3 },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull", "max"],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\", instance=~\"$instance\"}[1m])) * 100)",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU LOAD (CORE AVG)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#39FF14", "value": null },
+              { "color": "#E0B400", "value": 75 },
+              { "color": "#F2495C", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 9, "w": 10, "x": 14, "y": 3 },
+      "id": 3,
+      "options": {
+        "displayMode": "lcd",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "100 - ((node_memory_MemAvailable_bytes{instance=~\"$instance\"} / node_memory_MemTotal_bytes{instance=~\"$instance\"}) * 100)",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "MEMORY UTILIZATION (LCD)",
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "fillOpacity": 10, "lineWidth": 1 },
+          "unit": "Bps"
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "id": 4,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right" },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "rate(node_network_receive_bytes_total{instance=~\"$instance\", device!~\"lo\"}[1m])",
+          "legendFormat": "{{instance}} [IN]",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "Prometheus" },
+          "expr": "-rate(node_network_transmit_bytes_total{instance=~\"$instance\", device!~\"lo\"}[1m])",
+          "legendFormat": "{{instance}} [OUT]",
+          "refId": "B"
+        }
+      ],
+      "title": "NETWORK TRAFFIC // I/O",
+      "transparent": true,
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["matrix", "homelab"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": ["All"], "value": ["$__all"] },
+        "datasource": { "type": "prometheus", "uid": "Prometheus" },
+        "definition": "label_values(instance)",
+        "hide": 0,
+        "includeAll": true,
+        "name": "instance",
+        "query": { "query": "label_values(instance)", "refId": "StandardVariableQuery" },
+        "refresh": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "MATRIX NODE // V2",
+  "uid": "matrix-002"
+}

@@ -1,0 +1,113 @@
+---
+- name: Deploy Node Sensors
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Node Exporter
+      apt:
+        name: prometheus-node-exporter
+        state: present
+        update_cache: yes
+
+    - name: Ensure Node Exporter is running
+      service:
+        name: prometheus-node-exporter
+        state: started
+        enabled: yes
+
+- name: Setup Monitoring Server (Prometheus & Grafana)
+  hosts: monitoring
+  become: true
+  tasks:
+    # Prometheus Setup
+    - name: Install Prometheus
+      apt:
+        name: prometheus
+        state: present
+        update_cache: yes
+
+    - name: Configure Prometheus
+      template:
+        src: ../templates/prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+      notify: Restart Prometheus
+
+    # Grafana Setup
+    - name: Install dependencies for Grafana
+      apt:
+        name:
+          - apt-transport-https
+          - software-properties-common
+          - wget
+        state: present
+
+    - name: Add Grafana GPG key
+      apt_key:
+        url: https://apt.grafana.com/gpg.key
+        state: present
+
+    - name: Add Grafana repository
+      apt_repository:
+        repo: "deb https://apt.grafana.com stable main"
+        state: present
+        filename: grafana
+
+    - name: Install Grafana
+      apt:
+        name: grafana
+        state: present
+        update_cache: yes
+
+    # Provisioning
+    - name: Create provisioning directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /etc/grafana/provisioning/datasources
+        - /etc/grafana/provisioning/dashboards
+        - /var/lib/grafana/dashboards
+
+    - name: Configure Grafana Datasource
+      copy:
+        src: ../files/grafana/provisioning/datasources/prometheus.yml
+        dest: /etc/grafana/provisioning/datasources/prometheus.yml
+      notify: Restart Grafana
+
+    - name: Configure Grafana Dashboard Provisioning
+      copy:
+        src: ../files/grafana/provisioning/dashboards/dashboard.yml
+        dest: /etc/grafana/provisioning/dashboards/dashboard.yml
+      notify: Restart Grafana
+
+    - name: Copy Matrix Dashboard JSON
+      copy:
+        src: ../files/grafana/dashboards/matrix.json
+        dest: /var/lib/grafana/dashboards/matrix.json
+        mode: '0644'
+      notify: Restart Grafana
+
+    # Start Services
+    - name: Ensure Prometheus is started
+      service:
+        name: prometheus
+        state: started
+        enabled: yes
+
+    - name: Ensure Grafana is started
+      service:
+        name: grafana-server
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart Prometheus
+      service:
+        name: prometheus
+        state: restarted
+
+    - name: Restart Grafana
+      service:
+        name: grafana-server
+        state: restarted

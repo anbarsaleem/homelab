@@ -1,0 +1,3 @@
+adguard_host: "{{ vault_adguard_host }}"
+adguard_username: "adguardadmin"
+adguard_password: "{{ vault_adguard_password }}"

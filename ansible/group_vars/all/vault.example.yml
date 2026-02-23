@@ -1,0 +1,4 @@
+# ansible/group_vars/all/vault.example.yml
+vault_adguard_host: "http://adguard.example.com"
+vault_adguard_password: "change_me"
+vault_anbar_password: "sha512_hash_goes_here"

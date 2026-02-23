@@ -1,0 +1,42 @@
+- name: patch-proxmox
+  become: yes
+  hosts:
+    - proxmox
+  
+  tasks:
+    - name: Ensure pve-enterprise repository is disabled
+      ansible.builtin.apt_repository:
+        repo: deb https://enterprise.proxmox.com/debian/pve {{ ansible_distribution_release }} pve-enterprise
+        state: absent
+        update_cache: no
+
+    - name: Create pve-no-subscription source list file
+      ansible.builtin.copy:
+        content: |
+          # PVE non-subscription repository
+          deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
+        dest: /etc/apt/sources.list.d/pve-no-subscription.list
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      # Check if Proxmox is on Debian 12 (Bookworm). PVE 8 uses Bookworm.
+      when: ansible_distribution_release == 'bookworm'
+
+    - name: Update pkg cache and perform dist-upgrade
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: 'dist'
+        autoremove: yes
+      register: upgrade_status
+    
+    # Check the standard Ansible fact for required restart
+    - name: Check if a reboot is pending (using the needs_restarting fact)
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_file
+      
+    - name: Reboot if required by kernel or system component update
+      ansible.builtin.reboot:
+      # The reboot_file will exist if the system needs a reboot.
+      when: reboot_file.stat.exists

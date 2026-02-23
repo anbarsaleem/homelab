@@ -1,0 +1,17 @@
+[proxmox]
+# Connects using the MagicDNS name.
+optiplex-3020 ansible_host=optiplex-3020.example.ts.net
+
+[pi]
+# Connects using the MagicDNS name and specifies the python interpreter.
+raspberrypi ansible_host=raspberrypi.example.ts.net ansible_python_interpreter=/usr/bin/python3
+
+[monitoring]
+promgraf ansible_host=promgraf.example.ts.net
+
+[gtech]
+cs6200-dev ansible_host=cs6200-dev.example.ts.net
+
+[all:vars]
+ansible_host_key_checking=False
+

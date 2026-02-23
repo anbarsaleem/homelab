@@ -1,0 +1,37 @@
+- name: Sync Proxmox guests (like LXCs or VMs) to AdGuard DNS Rewrites
+  hosts: proxmox_all_lxc
+  connection: local 
+  gather_facts: false
+
+  vars_files:
+    - ../group_vars/all/vault.yml
+    - ../group_vars/all/adguard.yml
+
+  tasks:
+    - name: Derive IPv4 for LXC guest from Proxmox facts
+      set_fact:
+        guest_ipv4: >-
+          {{
+            (
+              proxmox_lxc_interfaces | default([])
+              | rejectattr('name','equalto','lo')
+              | map(attribute='inet')
+              | select('defined') | list | first
+              | regex_replace('/.*','')
+            )
+          }}
+
+    - name: Debug IP we derived (first time only, for sanity)
+      debug:
+        msg: "Host {{ inventory_hostname }} has IPv4 {{ guest_ipv4 }}"
+        
+    - name: Ensure AdGuard has a DNS rewrite for this guest
+      community.dns.adguardhome_rewrite:
+        host: "{{ adguard_host }}"
+        username: "{{ adguard_username }}"
+        password: "{{ adguard_password }}"
+        validate_certs: false
+        domain: "{{ inventory_hostname }}"   
+        answer: "{{ guest_ipv4 }}"
+        state: present
+      when: guest_ipv4 is defined and guest_ipv4 != ''
