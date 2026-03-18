@@ -1,0 +1,21 @@
+jobscout_metrics_port: 2112
+jobscout_resume_url: "https://anbarsaleem.com/resume.pdf"
+jobscout_email_to: "anbar.saleem@gmail.com"
+jobscout_email_from: "anbar.saleem@gmail.com"
+jobscout_smtp_host: "smtp.gmail.com"
+jobscout_smtp_port: 587
+jobscout_schedule: "0 8 * * *"
+jobscout_user: "jobscout"
+jobscout_home: "/opt/jobscout"
+jobscout_binary: "jobscout-linux-amd64"
+
+# LXC container settings
+jobscout_lxc_vmid: 200
+jobscout_lxc_hostname: "jobscout"
+jobscout_lxc_cores: 1
+jobscout_lxc_memory: 512
+jobscout_lxc_disk: 8
+jobscout_lxc_storage: "local-lvm"
+jobscout_lxc_template_storage: "local"
+jobscout_lxc_template: "debian-12-standard_12.12-1_amd64.tar.zst"
+jobscout_lxc_node: "optiplex-3020"

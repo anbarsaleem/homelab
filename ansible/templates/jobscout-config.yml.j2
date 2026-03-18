@@ -1,0 +1,182 @@
+schedule: "{{ jobscout_schedule }}"
+metrics_port: {{ jobscout_metrics_port }}
+top_results: 20
+
+resume:
+  url: "{{ jobscout_resume_url }}"
+  cache_path: "{{ jobscout_home }}/resume_cache.pdf"
+  cache_ttl_days: 7
+  fallback_years_experience: 2
+
+email:
+  to: "{{ jobscout_email_to }}"
+  from: "{{ jobscout_email_from }}"
+  smtp_host: "{{ jobscout_smtp_host }}"
+  smtp_port: {{ jobscout_smtp_port }}
+
+companies:
+  # Greenhouse boards
+  - name: "Cloudflare"
+    slug: "cloudflare"
+    board: "greenhouse"
+
+  - name: "Stripe"
+    slug: "stripe"
+    board: "greenhouse"
+
+  - name: "Discord"
+    slug: "discord"
+    board: "greenhouse"
+
+  - name: "Figma"
+    slug: "figma"
+    board: "greenhouse"
+
+  - name: "Databricks"
+    slug: "databricks"
+    board: "greenhouse"
+
+  - name: "Datadog"
+    slug: "datadog"
+    board: "greenhouse"
+
+  - name: "Airtable"
+    slug: "airtable"
+    board: "greenhouse"
+
+  - name: "Coinbase"
+    slug: "coinbase"
+    board: "greenhouse"
+
+  - name: "Lyft"
+    slug: "lyft"
+    board: "greenhouse"
+
+  - name: "Airbnb"
+    slug: "airbnb"
+    board: "greenhouse"
+
+  - name: "Twilio"
+    slug: "twilio"
+    board: "greenhouse"
+
+  - name: "Dropbox"
+    slug: "dropbox"
+    board: "greenhouse"
+
+  - name: "MongoDB"
+    slug: "mongodb"
+    board: "greenhouse"
+
+  - name: "Elastic"
+    slug: "elastic"
+    board: "greenhouse"
+
+  - name: "Reddit"
+    slug: "reddit"
+    board: "greenhouse"
+
+  # Cloud / Infra companies
+  - name: "Fastly"
+    slug: "fastly"
+    board: "greenhouse"
+
+  - name: "PagerDuty"
+    slug: "pagerduty"
+    board: "greenhouse"
+
+  - name: "Vercel"
+    slug: "vercel"
+    board: "greenhouse"
+
+  - name: "Netlify"
+    slug: "netlify"
+    board: "greenhouse"
+
+  - name: "CockroachDB"
+    slug: "cockroachlabs"
+    board: "greenhouse"
+
+  - name: "Tailscale"
+    slug: "tailscale"
+    board: "greenhouse"
+
+  - name: "Cribl"
+    slug: "cribl"
+    board: "greenhouse"
+
+  - name: "New Relic"
+    slug: "newrelic"
+    board: "greenhouse"
+
+  - name: "Sumo Logic"
+    slug: "sumologic"
+    board: "greenhouse"
+
+  - name: "CoreWeave"
+    slug: "coreweave"
+    board: "greenhouse"
+
+  - name: "Honeycomb"
+    slug: "honeycomb"
+    board: "greenhouse"
+
+  - name: "PlanetScale"
+    slug: "planetscale"
+    board: "greenhouse"
+
+  - name: "Mezmo"
+    slug: "mezmo"
+    board: "greenhouse"
+
+  - name: "Grafana Labs"
+    slug: "grafanalabs"
+    board: "greenhouse"
+
+  - name: "Zscaler"
+    slug: "zscaler"
+    board: "greenhouse"
+
+  # Lever boards
+  - name: "Plaid"
+    slug: "plaid"
+    board: "lever"
+
+  - name: "Sysdig"
+    slug: "sysdig"
+    board: "lever"
+
+  - name: "Neon"
+    slug: "neon"
+    board: "lever"
+
+scoring:
+  priority_skills:
+    - "go"
+    - "golang"
+    - "kubernetes"
+    - "k8s"
+    - "cloud"
+    - "infrastructure"
+    - "platform"
+    - "distributed systems"
+    - "microservices"
+    - "docker"
+    - "terraform"
+    - "aws"
+    - "gcp"
+    - "linux"
+  target_titles:
+    - "software engineer"
+    - "infrastructure engineer"
+    - "platform engineer"
+    - "site reliability engineer"
+    - "sre"
+    - "backend engineer"
+    - "systems engineer"
+  seniority_levels:
+    - "junior"
+    - "mid"
+    - "senior"
+    - "staff"
+    - "principal"

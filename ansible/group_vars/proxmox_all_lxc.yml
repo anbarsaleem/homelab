@@ -1,0 +1,5 @@
+# LXC containers are on the local network and not directly reachable from
+# outside. All Ansible connections are proxied through the Proxmox host.
+# The proxy address is derived at runtime from the PROXMOX_URL env variable
+# (defined in the gitignored .env file) — no IPs or hostnames are stored here.
+ansible_ssh_common_args: "-o ProxyJump={{ lookup('env', 'PROXMOX_URL') | urlsplit('hostname') }}"

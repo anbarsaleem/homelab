@@ -2,6 +2,7 @@
   hosts:
     - proxmox
     - pi
+    - monitoring
     - proxmox_all_lxc
   become: yes
   gather_facts: no

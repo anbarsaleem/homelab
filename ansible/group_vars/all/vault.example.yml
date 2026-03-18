@@ -2,3 +2,7 @@
 vault_adguard_host: "http://adguard.example.com"
 vault_adguard_password: "change_me"
 vault_anbar_password: "sha512_hash_goes_here"
+
+# JobScout
+vault_gmail_app_password: "xxxx xxxx xxxx xxxx"   # 16-char Gmail App Password
+vault_jobscout_root_password: "change_me"          # Root password for jobscout LXC

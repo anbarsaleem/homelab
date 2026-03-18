@@ -1,0 +1,25 @@
+[Unit]
+Description=JobScout - Job Scraper and Matcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ jobscout_user }}
+ExecStart={{ jobscout_home }}/jobscout --config {{ jobscout_home }}/config.yml
+EnvironmentFile={{ jobscout_home }}/.env
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jobscout
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths={{ jobscout_home }}
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

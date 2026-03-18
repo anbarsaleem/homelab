@@ -88,6 +88,13 @@
         mode: '0644'
       notify: Restart Grafana
 
+    - name: Copy JobScout Dashboard JSON
+      copy:
+        src: ../files/grafana/dashboards/jobscout.json
+        dest: /var/lib/grafana/dashboards/jobscout.json
+        mode: '0644'
+      notify: Restart Grafana
+
     # Start Services
     - name: Ensure Prometheus is started
       service:

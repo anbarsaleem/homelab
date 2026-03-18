@@ -1,0 +1,68 @@
+---
+# Creates the jobscout LXC container on Proxmox.
+# Prerequisites:
+#   - Run: source .env (sets PROXMOX_URL, PROXMOX_TOKEN_ID, PROXMOX_TOKEN_SECRET)
+#   - vault_jobscout_root_password must be set in group_vars/all/vault.yml
+#
+# After creation, run setup-sudoers.yml to add the anbar user.
+#
+# Usage:
+#   ansible-playbook playbooks/create-jobscout-lxc.yml
+
+- name: Create jobscout LXC container
+  hosts: proxmox
+  gather_facts: false
+
+  vars:
+    proxmox_api_host: "{{ lookup('env', 'PROXMOX_URL') | urlsplit('hostname') }}"
+    proxmox_api_token_id: "ansible@pve!{{ lookup('env', 'PROXMOX_TOKEN_ID') }}"
+    proxmox_api_token_secret: "{{ lookup('env', 'PROXMOX_TOKEN_SECRET') }}"
+
+  tasks:
+    # Template download requires Datastore permissions not granted to the API token.
+    # Run manually on the Proxmox host if the template is missing:
+    #   sudo pveam download local debian-12-standard_12.12-1_amd64.tar.zst
+
+    - name: Create jobscout LXC container
+      community.proxmox.proxmox:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "ansible@pve"
+        api_token_id: "{{ lookup('env', 'PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ proxmox_api_token_secret }}"
+        validate_certs: false
+        node: "{{ jobscout_lxc_node }}"
+        vmid: "{{ jobscout_lxc_vmid }}"
+        hostname: "{{ jobscout_lxc_hostname }}"
+        ostemplate: "{{ jobscout_lxc_template_storage }}:vztmpl/{{ jobscout_lxc_template }}"
+        cores: "{{ jobscout_lxc_cores }}"
+        memory: "{{ jobscout_lxc_memory }}"
+        disk: "{{ jobscout_lxc_storage }}:{{ jobscout_lxc_disk }}"
+        netif: '{"net0":"name=eth0,bridge=vmbr0,ip=dhcp"}'
+        password: "{{ vault_jobscout_root_password }}"
+        onboot: true
+        unprivileged: true
+        features:
+          - nesting=1
+        timezone: "America/New_York"
+        state: present
+
+    - name: Start jobscout container
+      community.proxmox.proxmox:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "ansible@pve"
+        api_token_id: "{{ lookup('env', 'PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ proxmox_api_token_secret }}"
+        validate_certs: false
+        node: "{{ jobscout_lxc_node }}"
+        vmid: "{{ jobscout_lxc_vmid }}"
+        state: started
+
+    - name: Wait for container to come up
+      pause:
+        seconds: 15
+
+    - name: Confirm container is running
+      debug:
+        msg: >
+          Container '{{ jobscout_lxc_hostname }}' (VMID {{ jobscout_lxc_vmid }}) created and started.
+          Next step: ansible-playbook playbooks/setup-sudoers.yml

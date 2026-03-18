@@ -13,3 +13,13 @@ scrape_configs:
         labels:
           instance: '{{ host }}'
 {% endfor %}
+
+  - job_name: 'jobscout'
+    static_configs:
+{% if 'jobscout' in hostvars %}
+      - targets: ['{{ hostvars["jobscout"]["ansible_host"] | default("jobscout") }}:{{ jobscout_metrics_port }}']
+        labels:
+          instance: 'jobscout'
+{% else %}
+      [] # jobscout container not yet in inventory
+{% endif %}

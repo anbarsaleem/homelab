@@ -1,0 +1,102 @@
+---
+# Deploys the jobscout binary, config, and systemd service to the LXC container.
+#
+# Prerequisites:
+#   - LXC container created via create-jobscout-lxc.yml
+#   - anbar user provisioned via setup-sudoers.yml
+#   - Binary cross-compiled: cd jobscout && make build
+#   - vault_gmail_app_password set in group_vars/all/vault.yml
+#
+# Usage:
+#   ansible-playbook playbooks/deploy-jobscout.yml
+
+- name: Deploy jobscout application
+  hosts: jobscout
+  become: true
+
+  tasks:
+    - name: Install ca-certificates
+      apt:
+        name: ca-certificates
+        state: present
+        update_cache: true
+
+    - name: Install prometheus-node-exporter
+      apt:
+        name: prometheus-node-exporter
+        state: present
+
+    - name: Create jobscout system user
+      user:
+        name: "{{ jobscout_user }}"
+        system: true
+        shell: /usr/sbin/nologin
+        home: "{{ jobscout_home }}"
+        create_home: true
+        state: present
+
+    - name: Create jobscout home directory
+      file:
+        path: "{{ jobscout_home }}"
+        state: directory
+        owner: "{{ jobscout_user }}"
+        group: "{{ jobscout_user }}"
+        mode: "0755"
+
+    - name: Copy jobscout binary
+      copy:
+        src: "../../jobscout/bin/{{ jobscout_binary }}"
+        dest: "{{ jobscout_home }}/jobscout"
+        owner: "{{ jobscout_user }}"
+        group: "{{ jobscout_user }}"
+        mode: "0755"
+      notify: Restart jobscout
+
+    - name: Template jobscout config
+      template:
+        src: ../templates/jobscout-config.yml.j2
+        dest: "{{ jobscout_home }}/config.yml"
+        owner: "{{ jobscout_user }}"
+        group: "{{ jobscout_user }}"
+        mode: "0644"
+      notify: Restart jobscout
+
+    - name: Template jobscout env file
+      template:
+        src: ../templates/jobscout-env.j2
+        dest: "{{ jobscout_home }}/.env"
+        owner: "{{ jobscout_user }}"
+        group: "{{ jobscout_user }}"
+        mode: "0600"
+      notify: Restart jobscout
+
+    - name: Template systemd service unit
+      template:
+        src: ../templates/jobscout.service.j2
+        dest: /etc/systemd/system/jobscout.service
+        mode: "0644"
+      notify:
+        - Reload systemd
+        - Restart jobscout
+
+    - name: Enable and start prometheus-node-exporter
+      service:
+        name: prometheus-node-exporter
+        state: started
+        enabled: true
+
+    - name: Enable and start jobscout
+      service:
+        name: jobscout
+        state: started
+        enabled: true
+
+  handlers:
+    - name: Reload systemd
+      systemd:
+        daemon_reload: true
+
+    - name: Restart jobscout
+      service:
+        name: jobscout
+        state: restarted
