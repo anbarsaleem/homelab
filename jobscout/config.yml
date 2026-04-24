@@ -3,7 +3,7 @@ metrics_port: 2112
 top_results: 20
 
 resume:
-  url: "https://anbarsaleem.com/resume.pdf"
+  url: "https://anbarsaleem.com/resources/Anbar_Saleem_resume.pdf"
   cache_path: ""  # empty = use system temp dir
   cache_ttl_days: 7
   fallback_years_experience: 2  # used when PDF can't be fetched; update to match your actual YOE

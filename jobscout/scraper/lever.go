@@ -54,6 +54,7 @@ func scrapeLever(company Company, client *http.Client) ([]Job, error) {
 		}
 		jobs = append(jobs, Job{
 			ID:          lp.ID,
+			Board:       BoardLever,
 			Title:       lp.Text,
 			Company:     company.Name,
 			Location:    lp.Categories.Location,

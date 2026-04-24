@@ -41,13 +41,16 @@ type ScoringConfig struct {
 }
 
 type Config struct {
-	Schedule    string          `yaml:"schedule"`
-	MetricsPort int             `yaml:"metrics_port"`
-	TopResults  int             `yaml:"top_results"`
-	Resume      ResumeConfig    `yaml:"resume"`
-	Email       EmailConfig     `yaml:"email"`
-	Companies   []CompanyConfig `yaml:"companies"`
-	Scoring     ScoringConfig   `yaml:"scoring"`
+	Schedule        string          `yaml:"schedule"`
+	MetricsPort     int             `yaml:"metrics_port"`
+	FeedbackPort    int             `yaml:"feedback_port"`
+	FeedbackBaseURL string          `yaml:"feedback_base_url"`
+	DBPath          string          `yaml:"db_path"`
+	TopResults      int             `yaml:"top_results"`
+	Resume          ResumeConfig    `yaml:"resume"`
+	Email           EmailConfig     `yaml:"email"`
+	Companies       []CompanyConfig `yaml:"companies"`
+	Scoring         ScoringConfig   `yaml:"scoring"`
 
 	// Loaded from environment, not YAML
 	GmailAppPassword string `yaml:"-"`
@@ -74,6 +77,12 @@ func LoadConfig(path string) (*Config, error) {
 	}
 	if cfg.Resume.CacheTTLDays == 0 {
 		cfg.Resume.CacheTTLDays = 7
+	}
+	if cfg.FeedbackPort == 0 {
+		cfg.FeedbackPort = 8080
+	}
+	if cfg.DBPath == "" {
+		cfg.DBPath = "/opt/jobscout/jobscout.db"
 	}
 
 	return &cfg, nil

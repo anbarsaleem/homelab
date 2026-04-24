@@ -26,13 +26,14 @@ type Config struct {
 }
 
 type templateData struct {
-	Date     string
-	Jobs     []scraper.Job
-	TotalJobs int
+	Date            string
+	Jobs            []scraper.Job
+	TotalJobs       int
+	FeedbackBaseURL string
 }
 
 // Send renders the HTML template and delivers it via Gmail SMTP.
-func Send(cfg Config, jobs []scraper.Job) error {
+func Send(cfg Config, jobs []scraper.Job, feedbackBaseURL string) error {
 	tmplBytes, err := templateFS.ReadFile("template.html")
 	if err != nil {
 		return fmt.Errorf("reading template: %w", err)
@@ -44,9 +45,10 @@ func Send(cfg Config, jobs []scraper.Job) error {
 	}
 
 	data := templateData{
-		Date:      time.Now().Format("January 2, 2006"),
-		Jobs:      jobs,
-		TotalJobs: len(jobs),
+		Date:            time.Now().Format("January 2, 2006"),
+		Jobs:            jobs,
+		TotalJobs:       len(jobs),
+		FeedbackBaseURL: feedbackBaseURL,
 	}
 
 	var body bytes.Buffer

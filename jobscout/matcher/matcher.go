@@ -118,12 +118,23 @@ func containsAny(s string, keywords []string) bool {
 }
 
 // RankJobs scores each job and returns them sorted by descending score.
-// Jobs scoring 0 are excluded.
-func RankJobs(jobs []scraper.Job, profile *resume.Profile, prioritySkills, targetTitles []string) []scraper.Job {
+// Jobs scoring 0 are excluded. adjust is an optional function that returns a
+// learned score delta for a job; pass nil for no adjustment.
+func RankJobs(jobs []scraper.Job, profile *resume.Profile, prioritySkills, targetTitles []string, adjust func(*scraper.Job) int) []scraper.Job {
 	resumeLevel := inferLevel(profile.YearsExperience)
 
 	for i := range jobs {
-		jobs[i].Score = score(&jobs[i], profile, resumeLevel, profile.YearsExperience, prioritySkills, targetTitles)
+		base := score(&jobs[i], profile, resumeLevel, profile.YearsExperience, prioritySkills, targetTitles)
+		if base > 0 && adjust != nil {
+			base += adjust(&jobs[i])
+			if base > 100 {
+				base = 100
+			}
+			if base < 1 {
+				base = 1
+			}
+		}
+		jobs[i].Score = base
 	}
 
 	var matched []scraper.Job

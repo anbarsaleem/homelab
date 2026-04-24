@@ -91,6 +91,22 @@
     .job-meta strong {
       color: #334155;
     }
+    .feedback-links {
+      margin-top: 10px;
+    }
+    .feedback-links a {
+      display: inline-block;
+      margin-right: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #fff;
+    }
+    .feedback-like     { background: #22c55e; }
+    .feedback-superlike { background: #6366f1; }
+    .feedback-dislike  { background: #94a3b8; }
     .footer {
       text-align: center;
       padding: 20px 32px;
@@ -127,6 +143,13 @@
           <strong>{{.Company}}</strong>
           {{if .Location}} &middot; {{.Location}}{{end}}
         </div>
+        {{if $.FeedbackBaseURL}}
+        <div class="feedback-links">
+          <a class="feedback-like"      href="{{$.FeedbackBaseURL}}/feedback?id={{.ID}}&board={{.Board}}&action=like">Applied</a>
+          <a class="feedback-superlike" href="{{$.FeedbackBaseURL}}/feedback?id={{.ID}}&board={{.Board}}&action=superlike">More Like This</a>
+          <a class="feedback-dislike"   href="{{$.FeedbackBaseURL}}/feedback?id={{.ID}}&board={{.Board}}&action=dislike">Not Relevant</a>
+        </div>
+        {{end}}
       </div>
       {{end}}
     </div>

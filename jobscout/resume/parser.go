@@ -37,6 +37,40 @@ var knownSkills = []string{
 // yearPattern matches patterns like "2019 – 2022" or "Jan 2020 - Present"
 var yearPattern = regexp.MustCompile(`\b(20\d{2})\b`)
 
+// experienceSectionMarkers are headings that start the work experience section.
+var experienceSectionMarkers = []string{"experience", "work history", "employment"}
+
+// educationSectionMarkers are headings that end the work experience section.
+var educationSectionMarkers = []string{"education", "academic", "university", "college", "degree"}
+
+// experienceSectionText returns the portion of the resume text that covers
+// work experience, stopping before the education section.
+func experienceSectionText(lower string) string {
+	start := -1
+	for _, marker := range experienceSectionMarkers {
+		if i := strings.Index(lower, marker); i != -1 {
+			if start == -1 || i < start {
+				start = i
+			}
+		}
+	}
+	if start == -1 {
+		return lower // no experience section found, fall back to full text
+	}
+
+	end := len(lower)
+	for _, marker := range educationSectionMarkers {
+		if i := strings.Index(lower[start:], marker); i != -1 {
+			candidate := start + i
+			if candidate > start && candidate < end {
+				end = candidate
+			}
+		}
+	}
+
+	return lower[start:end]
+}
+
 // ParseResume downloads (or reads from cache) a PDF resume and extracts a Profile.
 func ParseResume(url, cachePath string, cacheTTLDays int) (*Profile, error) {
 	pdfPath, err := ensureCached(url, cachePath, cacheTTLDays)
@@ -127,8 +161,10 @@ func parseText(text string) *Profile {
 		}
 	}
 
-	// Years of experience: find earliest and latest year mentioned
-	years := yearPattern.FindAllString(text, -1)
+	// Years of experience: only count years from the work experience section,
+	// not education (which would inflate YOE by including college start year).
+	expText := experienceSectionText(lower)
+	years := yearPattern.FindAllString(expText, -1)
 	if len(years) >= 2 {
 		earliest, latest := 9999, 0
 		for _, y := range years {

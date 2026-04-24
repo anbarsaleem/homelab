@@ -18,6 +18,7 @@ type Company struct {
 // Job is a normalized job posting from any platform.
 type Job struct {
 	ID          string
+	Board       BoardType
 	Title       string
 	Company     string
 	Location    string

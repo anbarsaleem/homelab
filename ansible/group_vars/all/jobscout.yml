@@ -1,5 +1,8 @@
 jobscout_metrics_port: 2112
-jobscout_resume_url: "https://anbarsaleem.com/resume.pdf"
+jobscout_feedback_port: 8080
+jobscout_db_path: "/opt/jobscout/jobscout.db"
+jobscout_feedback_base_url: "http://{{ jobscout_lxc_hostname }}.{{ tailscale_domain }}:{{ jobscout_feedback_port }}"
+jobscout_resume_url: "https://anbarsaleem.com/resources/Anbar_Saleem_resume.pdf"
 jobscout_email_to: "anbar.saleem@gmail.com"
 jobscout_email_from: "anbar.saleem@gmail.com"
 jobscout_smtp_host: "smtp.gmail.com"

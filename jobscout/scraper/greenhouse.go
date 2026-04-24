@@ -53,6 +53,7 @@ func scrapeGreenhouse(company Company, client *http.Client) ([]Job, error) {
 	for _, gj := range result.Jobs {
 		jobs = append(jobs, Job{
 			ID:          strconv.FormatInt(gj.ID, 10),
+			Board:       BoardGreenhouse,
 			Title:       gj.Title,
 			Company:     company.Name,
 			Location:    gj.Location.Name,
